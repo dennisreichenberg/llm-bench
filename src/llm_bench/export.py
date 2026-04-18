@@ -60,7 +60,9 @@ def to_csv(results: list[AggregatedResult], path: Path | None = None) -> str:
 
 def to_markdown(results: list[AggregatedResult], path: Path | None = None) -> str:
     rows = _to_rows(results)
-    headers = ["Model", "Prompt", "Runs", "Tokens/s", "TTFT (s)", "Total (s)", "Avg Tokens", "VRAM (MB)"]
+    headers = [
+        "Model", "Prompt", "Runs", "Tokens/s", "TTFT (s)", "Total (s)", "Avg Tokens", "VRAM (MB)"
+    ]
     col_keys = _FIELDS
 
     def fmt(v) -> str:

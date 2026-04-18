@@ -57,7 +57,7 @@ class BenchConfig:
     timeout: int = 120
 
     @classmethod
-    def from_path(cls, path: Path) -> "BenchConfig":
+    def from_path(cls, path: Path) -> BenchConfig:
         raw = tomllib.loads(path.read_text(encoding="utf-8"))
         prompts = [PromptConfig(name=p["name"], text=p["text"]) for p in raw.get("prompts", [])]
         return cls(
@@ -69,11 +69,14 @@ class BenchConfig:
         )
 
     @classmethod
-    def default(cls) -> "BenchConfig":
+    def default(cls) -> BenchConfig:
         return cls(
             prompts=[
                 PromptConfig(name="short", text="What is the capital of France?"),
-                PromptConfig(name="reasoning", text="Explain the difference between a list and a tuple in Python."),
+                PromptConfig(
+                    name="reasoning",
+                    text="Explain the difference between a list and a tuple in Python.",
+                ),
                 PromptConfig(name="creative", text="Write a haiku about programming."),
             ]
         )

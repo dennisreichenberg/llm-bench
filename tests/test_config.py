@@ -3,8 +3,6 @@
 import textwrap
 from pathlib import Path
 
-import pytest
-
 from llm_bench.config import BenchConfig
 
 

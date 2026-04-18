@@ -8,7 +8,6 @@ from pathlib import Path
 import click
 import httpx
 from rich.console import Console
-from rich.live import Live
 from rich.table import Table
 
 from .benchmark import AggregatedResult, run_benchmark
@@ -46,12 +45,21 @@ def _build_results_table(results: list[AggregatedResult]) -> Table:
 
 @click.group(invoke_without_command=True)
 @click.pass_context
-@click.option("--config", "-c", "config_path", default=None, type=click.Path(), help="Path to TOML config file.")
+@click.option(
+    "--config", "-c", "config_path", default=None, type=click.Path(),
+    help="Path to TOML config file.",
+)
 @click.option("--host", default=None, help="Ollama base URL (overrides config).")
 @click.option("--models", "-m", default=None, help="Comma-separated list of models to benchmark.")
 @click.option("--runs", "-n", default=None, type=int, help="Runs per model/prompt pair.")
-@click.option("--output", "-o", default=None, type=click.Path(), help="Output file path (auto-detects format from extension).")
-@click.option("--format", "fmt", default=None, type=click.Choice(["json", "csv", "markdown"]), help="Output format (overrides extension detection).")
+@click.option(
+    "--output", "-o", default=None, type=click.Path(),
+    help="Output file path (auto-detects format from extension).",
+)
+@click.option(
+    "--format", "fmt", default=None, type=click.Choice(["json", "csv", "markdown"]),
+    help="Output format (overrides extension detection).",
+)
 def main(
     ctx: click.Context,
     config_path: str | None,
@@ -89,13 +97,20 @@ def main(
     if runs is not None:
         cfg.runs_per_pair = runs
 
-    console.print(f"[bold]llm-bench[/bold] — benchmarking [cyan]{len(cfg.models)}[/cyan] model(s) × [cyan]{len(cfg.prompts)}[/cyan] prompt(s) × [cyan]{cfg.runs_per_pair}[/cyan] run(s)")
+    console.print(
+        f"[bold]llm-bench[/bold] — benchmarking [cyan]{len(cfg.models)}[/cyan] model(s)"
+        f" × [cyan]{len(cfg.prompts)}[/cyan] prompt(s)"
+        f" × [cyan]{cfg.runs_per_pair}[/cyan] run(s)"
+    )
     console.print(f"[dim]Ollama: {cfg.host}[/dim]\n")
 
     results: list[AggregatedResult] = []
 
     def on_progress(model, prompt, run_idx, total_runs):
-        console.print(f"  [dim]{model}[/dim] · [dim]{prompt.name}[/dim] · run {run_idx}/{total_runs}…", end="\r")
+        console.print(
+            f"  [dim]{model}[/dim] · [dim]{prompt.name}[/dim] · run {run_idx}/{total_runs}…",
+            end="\r",
+        )
 
     try:
         results = run_benchmark(cfg, progress_callback=on_progress)
@@ -103,12 +118,16 @@ def main(
         err.print(f"\n[red]Cannot connect to Ollama at {cfg.host}.[/red] Is Ollama running?")
         sys.exit(1)
     except httpx.HTTPStatusError as exc:
-        err.print(f"\n[red]Ollama API error {exc.response.status_code}:[/red] {exc.response.text[:200]}")
+        err.print(
+            f"\n[red]Ollama API error {exc.response.status_code}:[/red] {exc.response.text[:200]}"
+        )
         sys.exit(1)
 
     console.print()
     if not results:
-        err.print("[yellow]No results collected.[/yellow] Check your model names and Ollama connection.")
+        err.print(
+            "[yellow]No results collected.[/yellow] Check your model names and Ollama connection."
+        )
         sys.exit(1)
 
     console.print(_build_results_table(results))
@@ -142,7 +161,10 @@ def main(
 
 
 @main.command("init")
-@click.option("--output", "-o", default="bench.toml", show_default=True, help="Where to write the config file.")
+@click.option(
+    "--output", "-o", default="bench.toml", show_default=True,
+    help="Where to write the config file.",
+)
 @click.option("--force", is_flag=True, help="Overwrite existing file.")
 def init_cmd(output: str, force: bool) -> None:
     """Generate a default llm-bench.toml config file."""
@@ -151,11 +173,15 @@ def init_cmd(output: str, force: bool) -> None:
         err.print(f"[yellow]{path} already exists.[/yellow] Use --force to overwrite.")
         sys.exit(1)
     path.write_text(DEFAULT_CONFIG, encoding="utf-8")
-    console.print(f"[green]Created[/green] {path} — edit it, then run: [bold]llm-bench --config {path}[/bold]")
+    console.print(
+        f"[green]Created[/green] {path} — edit it, then run: [bold]llm-bench --config {path}[/bold]"
+    )
 
 
 @main.command("models")
-@click.option("--host", default="http://localhost:11434", show_default=True, help="Ollama base URL.")
+@click.option(
+    "--host", default="http://localhost:11434", show_default=True, help="Ollama base URL."
+)
 def models_cmd(host: str) -> None:
     """List available Ollama models."""
     from .ollama import list_models

@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 import httpx
 
-from .config import BenchConfig, PromptConfig
+from .config import BenchConfig
 from .ollama import RunMetrics, generate_streaming, get_model_vram_mb
 
 
